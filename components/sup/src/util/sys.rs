@@ -15,7 +15,7 @@
 use std::net::IpAddr;
 use std::str;
 
-use libc;
+use libc::{self, pid_t};
 
 use error::{Error, Result};
 use hcore::util::sys;
@@ -28,7 +28,6 @@ pub fn ip() -> Result<IpAddr> {
         Err(e) => Err(sup_error!(Error::HabitatCore(e))),
     }
 }
-
 
 extern "C" {
     pub fn gethostname(name: *mut libc::c_char, size: libc::size_t) -> libc::c_int;

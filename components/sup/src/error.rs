@@ -131,6 +131,7 @@ pub enum Error {
     NameLookup(io::Error),
     NetParseError(net::AddrParseError),
     NoRunFile,
+    NoProcessLock,
     NulError(ffi::NulError),
     PackageArchiveMalformed(String),
     PackageNotFound(package::PackageIdent),
@@ -219,6 +220,13 @@ impl fmt::Display for SupError {
             Error::NoRunFile => {
                 format!("No run file is present for this package; specify a run hook or \
                          $pkg_svc_run in your plan")
+            }
+            Error::NoProcessLock => {
+                format!("Unable to obtain a mutually exclusive process lock. This typically \
+                    happens if a previously running Supervisor was unable to cleanup \
+                    `/hab/sup/default/LOCK` before terminating or if you are attempting to run \
+                    multiple Supervisors. Running multiple Supervisors is not recommended, but \
+                    can be done by setting a value for `--override-name`")
             }
             Error::NulError(ref e) => format!("{}", e),
             Error::PackageArchiveMalformed(ref e) => {
@@ -324,6 +332,7 @@ impl error::Error for SupError {
                 "No run file is present for this package; specify a run hook or $pkg_svc_run \
                  in your plan"
             }
+            Error::NoProcessLock => "Unable to obtain a mutual exclusive process lock",
             Error::NulError(_) => "An attempt was made to build a CString with a null byte inside it",
             Error::PackageArchiveMalformed(_) => "Package archive was unreadable or had unexpected contents",
             Error::PackageNotFound(_) => "Cannot find a package",
